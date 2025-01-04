@@ -215,7 +215,7 @@ public class jsnake {
 
     public void play(int s)
     {
-        System.out.print("SCORE : "+length-3);
+        System.out.print("SCORE : "+(length-3));
         for(int i=0;i<grid.length;i++)
         {
             for(int j=0;j<grid[0].length;j++)
