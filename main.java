@@ -43,7 +43,7 @@ public class jsnake {
     }
 
     public static void main(String[] args) throws InterruptedException ,IOException {   
-        jsnake inst=new jsnake(20,69);
+        jsnake inst=new jsnake(3,80);
         inst.grid[inst.rows/2][inst.cols/2]=1;
         inst.display();
         int current_key=0;
@@ -215,7 +215,7 @@ public class jsnake {
 
     public void play(int s)
     {
-        System.out.print("SCORE : "+length);
+        System.out.print("SCORE : "+length-3);
         for(int i=0;i<grid.length;i++)
         {
             for(int j=0;j<grid[0].length;j++)
