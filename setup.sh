@@ -1,5 +1,5 @@
 #!/bin/bash
 echo "alias jsnake='bash $(pwd)/jsnake.sh'" >> ~/.bashrc
-source ~/.zashrc
+source ~/.zshrc
 echo "jsnake setup complete"
 
