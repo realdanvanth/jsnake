@@ -1,11 +1,11 @@
 # jsnake
 
 ## Installation Script
-bash:
+**bash:**
 ```bash
 git clone https://github.com/realdanvanth/jsnake.git && echo 'alias jsnake="java $(pwd)/jsnake/main.java"' >> ~/.bashrc 
 ```
-zsh:
+**zsh:**
 ```zsh
 git clone https://github.com/realdanvanth/jsnake.git && echo 'alias jsnake="java $(pwd)/jsnake/main.java"' >> ~/.zshrc
 ```
