@@ -17,4 +17,6 @@ JSnake is a lightweight terminal-based Snake game for Linux, built with Java and
 - **W/A/S/D**: Move the snake
 - **Q**: Quit the game
 
+##Images
+
  ![Snake Game Screenshot](images/1.png "Snake Game")
