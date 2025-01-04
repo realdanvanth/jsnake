@@ -43,7 +43,7 @@ public class jsnake {
     }
 
     public static void main(String[] args) throws InterruptedException ,IOException {   
-        jsnake inst=new jsnake(3,69);
+        jsnake inst=new jsnake(20,69);
         inst.grid[inst.rows/2][inst.cols/2]=1;
         inst.display();
         int current_key=0;

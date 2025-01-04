@@ -1,2 +1,20 @@
 # jsnake
-jsnake is a simple linux terminal snake game that runs on java using ANSI code
+
+## Installation Script
+
+```bash
+git clone https://github.com/realdanvanth/jsnake.git && echo 'alias jsnake="java $(pwd)/jsnake/main.java"' >> ~/.bashrc 
+```
+
+```zsh
+git clone https://github.com/realdanvanth/jsnake.git && echo 'alias jsnake="java $(pwd)/jsnake/main.java"' >> ~/.zshrc
+```
+
+JSnake is a lightweight terminal-based Snake game for Linux, built with Java and utilizing ANSI escape codes for visuals. 
+
+## Controls
+
+- **W/A/S/D**: Move the snake
+- **Q**: Quit the game
+
+ ![Snake Game Screenshot](images/1.png "Snake Game")
