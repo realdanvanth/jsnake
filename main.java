@@ -16,7 +16,8 @@ public class jsnake {
 
     public void get_term_info() throws InterruptedException ,IOException
     {
-        System.out.print("\033[H\033[2J");            
+        System.out.print("\033[H\033[2J");   
+        System.out.print("\033[?25l"); 
         System.out.flush();
         InputStreamReader ir;
         BufferedReader br;
