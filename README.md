@@ -1,4 +1,4 @@
-# jsnake
+# rsnake
 
 ## Installation Script
 **bash:**
