@@ -1,299 +1,145 @@
-import java.io.*;
-import java.util.Random;
-public class jsnake {
-    int length;
-    int timeout;
-    int rows;
-    int cols;
-    int grid[][];
-    jsnake(int length,int timeout) throws InterruptedException ,IOException
-    {
-        this.length=length;
-        this.timeout=-1*timeout;
-        get_term_info();
-        this.grid=new int[rows-1][cols]; 
-    }
-
-    public void get_term_info() throws InterruptedException ,IOException
-    {
-        System.out.print("\033[H\033[2J");   
-        System.out.print("\033[?25l"); 
-        System.out.flush();
-        InputStreamReader ir;
-        BufferedReader br;
-        ProcessBuilder pb = new ProcessBuilder("tput","cols");
-        pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
-        Process p=pb.start();
-        ir=new InputStreamReader(p.getInputStream());
-        br=new BufferedReader(ir);
-        cols=Integer.parseInt(br.readLine());
-        int exitcode=p.waitFor();
-        pb = new ProcessBuilder("tput","lines");
-        pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
-        p=pb.start();
-        ir=new InputStreamReader(p.getInputStream());
-        br=new BufferedReader(ir);
-        rows=Integer.parseInt(br.readLine());
-        exitcode=p.waitFor();
-        int mini = Math.min(rows,cols);
-        int grid[][]=new int[rows-1][cols];
-        pb = new ProcessBuilder("sh","-c","stty raw -echo");
-        pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
-        p=pb.start();
-        System.out.print("\033[H\033[2J");
-    }
-
-    public static void main(String[] args) throws InterruptedException ,IOException {   
-        jsnake inst=new jsnake(3,80);
-        inst.grid[inst.rows/2][inst.cols/2]=1;
-        inst.display();
-        int current_key=0;
-        int previous_key=0;
-        Random random=new Random();
-        int frequency=random.nextInt(10);
-        while(current_key!='q')
-        {
-            System.out.print("\033[1;1H");
-            Thread.sleep(80); 
-            previous_key=current_key;
-            if (System.in.available() > 0) {           
-                current_key = System.in.read();}
-            //System.out.print("current_key:"+current_key+" previous_key:"+previous_key);
-            if(previous_key==115&&current_key==119)
-            {
-                current_key=previous_key;
-                inst.play(current_key);
-            }
-            else if(current_key==115&&previous_key==119)
-            {
-                current_key=previous_key;
-                inst.play(current_key);
-            }
-            else if(previous_key ==100 && current_key==97)
-            {
-                current_key=previous_key;
-                inst.play(current_key);
-            }
-            else if( previous_key==97 && current_key==100)
-            {
-                current_key=previous_key;
-                inst.play(current_key);
-            }
-            else
-                inst.play(current_key);
-            if(frequency==1)
-            {
-                inst.generatefood();
-            }
-            frequency=random.nextInt(10);
-        }
-    }
-
-    public void clear()
-    {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-    }
-
-    public void generatefood()
-    { 
-        Random r= new Random();
-        int x=r.nextInt(grid.length);
-        int y=r.nextInt(grid[0].length);
-        if(grid[x][y]==0)
-        {
-            grid[x][y]=timeout;
-            change(x,y,grid[x][y]);
-        }
-    }
-
-    public void display()
-    {
-        for(int i=0;i<grid.length;i++)
-        {
-            for(int j=0;j<grid[0].length;j++)
-            {
-                System.out.printf("\033[%d;%dH",i+2,j+1);
-                System.out.print(" ");
-            }
-        }
-        System.out.flush();
-
-    }
-
-    public void change( int i, int j, int val)
-    {
-        System.out.printf("\033[%d;%dH",i+2,j+1);
-        if(val==1)
-        {
-            System.out.print("\033[34m");
-            System.out.print("@");
-            System.out.print("\033[0m");
-        }
-        else if(val<0)
-        {
-            System.out.print("\033[32m");
-            System.out.print("*");
-            System.out.print("\033[0m"); 
-        }
-
-        else if(val!=0)
-        {
-            System.out.print("\033[32m");
-            System.out.print("#");
-            System.out.print("\033[0m");
-        }
-        else
-            System.out.print(" ");
-        System.out.print("\033[1;1H");
-        System.out.flush();
-    }
-
-    public int neg(int i, int x)
-    {
-        if(x==0)
-        {
-            if(i==0)
-            {
-                return grid.length-1;
-            }
-            return i-1;
-        }
-        else
-        {
-            if(i==0)
-            {
-                return grid[0].length-1;
-            }
-            return i-1;
-        }
-    }
-
-    public int pos(int j, int x)
-    {
-        if(x==0)
-        {
-            if(j==grid.length-1)
-            {
-                return 0;
-            }
-            return j+1;
-        }
-        else
-        {
-            if(j==grid[0].length-1)
-            {
-                return 0;
-            }
-            return j+1;
-        }
-    }
-
-    public void changetail(int x,int y)
-    {
-        for(int i=0;i<grid.length;i++)
-        {
-            for(int j=0;j<grid[0].length;j++)
-            {
-                if(grid[i][j]<0)
-                {
-                    grid[i][j]++;
-                    change(i,j,grid[i][j]);
-                }
-                else if(grid[i][j]==length)
-                {
-                    grid[i][j]=0;
-                    change(i,j,0);
-                }
-                else if(grid[i][j]!=0&&(i!=x||j!=y))
-                {
-                    grid[i][j]++;
-                    change(i,j,grid[i][j]);
-                }
-            }
-        }
-    }
-
-    public void play(int s)
-    {
-        System.out.print("SCORE : "+(length-3));
-        for(int i=0;i<grid.length;i++)
-        {
-            for(int j=0;j<grid[0].length;j++)
-            {
-                if(length==0)
-                    return;
-                if(grid[i][j]==1&&s==115)
-                {
-                    if(grid[pos(i,0)][j]!=0&&grid[pos(i,0)][j]>0)
-                    {
-                        clear();
-                        System.out.print("GAME OVER SCORE: "+length);
-                        System.exit(0);
-                    }
-                    else if(grid[pos(i,0)][j]<0)
-                    {
-                        length++;
-                    }
-                    change(pos(i,0),j,1);
-                    grid[pos(i,0)][j]=1;
-                    changetail(pos(i,0),j);
-                    return;
-                }
-                else if(grid[i][j]==1&&s==119)
-                {
-                    if(grid[neg(i,0)][j]!=0&&grid[neg(i,0)][j]>0)
-                    {
-                        clear();
-                        System.out.print("GAME OVER SCORE: "+length);
-                        System.exit(0);
-                    }
-                    else if(grid[neg(i,0)][j]<0)
-                    {
-                        length++;
-                                            }
-                    change(neg(i,0),j,1);
-                    grid[neg(i,0)][j]=1;
-                    changetail(neg(i,0),j);
-                    return;
-                }
-                else if(grid[i][j]==1&&s==100)
-                {
-                    if(grid[i][pos(j,1)]!=0&&grid[i][pos(j,1)]>0)
-                    {
-                        clear();
-                        System.out.print("GAME OVER SCORE: "+length);
-                        System.exit(0);
-                    }
-                    else if(grid[i][pos(j,1)]<0)
-                    {
-                        length++;
-                                            }
-                    change(i,pos(j,1),1);
-                    grid[i][pos(j,1)]=1;
-                    changetail(i,pos(j,1));
-                    return;
-                }
-                else if(grid[i][j]==1&&s==97)
-                {
-                    if(grid[i][neg(j,1)]!=0&&grid[i][neg(j,1)]>0)
-                    {
-                        clear();
-                        System.out.print("GAME OVER SCORE: "+length);
-                        System.exit(0);
-                    }
-                    else if(grid[i][neg(j,1)]<0)
-                    {
-                        length++;
-                                            }
-                    change(i,neg(j,1),1);
-                    grid[i][neg(j,1)]=1;
-                    changetail(i,neg(j,1));
-                    return;
-                }
-            }
-        }
-    }
+#![allow(unused_imports)]
+#![allow(unused_macros)]
+#![allow(dead_code)]
+#![allow(non_snake_case)]
+use crossterm::{ExecutableCommand,cursor,terminal};
+use crossterm::terminal::enable_raw_mode;
+use crossterm::terminal::disable_raw_mode;
+use crossterm::event::{poll,read,KeyCode,Event};
+use crossterm::style::{Print,SetBackgroundColor,SetForegroundColor,Color};
+use std::io::{stdout,Write};
+use::std::{time::Duration};
+use rand::prelude::*;
+#[macro_export]
+macro_rules! eterm{
+    (clear) => {stdout().execute(terminal::Clear(terminal::ClearType::All)).unwrap()}; 
+    (flush) => {stdout().flush().unwrap()};
+    (bold)  => {stdout().execute(SetAttribute(Attribute::Bold))};
+    (size)  => {terminal::size().unwrap()};
+    (raw)   => {enable_raw_mode().unwrap()};
+    (unraw) => {disable_raw_mode().unwrap()};
+    (blink) => {stdout().execute(cursor::EnableBlinking)};
+    (dblink) => {stdout().execute(cursor::DisableBlinking)};
+    (hide) => {stdout().execute(cursor::Hide).unwrap()};
+    (show) => {stdout().execute(cursor::Show).unwrap()};
+    (underline) => {stdout().execute(SetAttribute(Attribute::underline))};
+    (move($x:expr,$y:expr))=> {stdout().execute(cursor::MoveTo($y,$x)).unwrap()};
+    (color(fg,$color:ident)) =>{stdout().execute(SetForegroundColor(Color::$color)).unwrap()};
+    (color(bg,$color:ident)) =>{stdout().execute(SetBackgroundColor(Color::$color)).unwrap()};
+    (print($string:literal)) => {stdout().execute(Print($string.to_string())).unwrap()};
+    (poll($time:expr)) => {poll(Duration::from_millis($time)).unwrap()};
 }
-
-
+macro_rules! input{
+    ($t:ty) => {{
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).unwrap();
+        input.trim().parse::<$t>().unwrap()
+    }};
+}
+macro_rules! string{
+    ($s:literal)=> {($s).to_string();};
+}
+#[derive(PartialEq)]
+enum Direction{
+    Up,
+    Down,
+    Left,
+    Right
+}
+fn main(){
+    eterm!(raw);
+    eterm!(clear);
+    eterm!(hide); 
+    let (rows,cols) = eterm!(size);
+    let mut snake:Vec<(u16,u16)> = vec![(cols/2,rows/2),(cols/2,rows/2+1),(cols/2,rows/2+2)];
+    let mut dir:Direction = Direction::Up; 
+    let mut fx:u16 = rand::rng().random_range(0..cols); 
+    let mut fy:u16 = rand::rng().random_range(0..rows);
+    loop{
+        if eterm!(poll(1)){
+            match read().unwrap(){
+                Event::Key(event)=>{
+                    if event.code == KeyCode::Char('q'){
+                        break;
+                    }
+                    else if event.code == KeyCode::Char('w'){
+                        if dir != Direction::Right
+                            {dir = Direction::Left;}
+                    }
+                    else if event.code == KeyCode::Char('d'){
+                      if dir != Direction::Up{
+                        dir = Direction::Down;
+                      }
+                    }
+                    else if event.code == KeyCode::Char('a'){
+                        if dir != Direction::Down{
+                        dir = Direction::Up;
+                        }
+                    }
+                    else if event.code == KeyCode::Char('s'){
+                        if dir != Direction::Left{
+                        dir = Direction::Right;
+                        }
+                    } 
+                },
+                _=>{continue;}
+            } 
+        }
+        if !nextFrame(&mut snake,&dir,cols,rows,(&mut fx,&mut fy))
+                        {break;}
+        display(&snake,(&fx,&fy));
+        eterm!(move(0,0));
+        //println!("{:?}",snake);
+    }
+    eterm!(clear);
+    eterm!(move(0,0));
+    println!("game over score:{}",snake.len());
+    eterm!(unraw);
+    eterm!(show);
+}
+fn nextFrame(snake:&mut Vec<(u16,u16)>,dir:&Direction,cols:u16,rows:u16,food:(&mut u16,&mut u16))->bool{
+    let (mut i,mut j):(u16,u16) = (snake[0].0,snake[0].1);
+    match *dir{
+        Direction::Up => {
+            j = if j==0 {rows-1} else {j-1};
+        },
+        Direction::Down =>{
+            j = (j+1)%rows;
+        },
+        Direction::Left =>{
+            i = if i==0 {cols-1} else {i-1}
+        },
+        Direction::Right =>{
+            i = (i+1)%cols;
+        },
+    }
+    for (x,y) in &mut *snake{
+        if *x==i&&*y==j {
+            return false;
+        }
+    }
+    snake.insert(0,(i,j));
+    if  *food.0!=i||*food.1!=j 
+        {
+          snake.pop();
+        }
+    else{
+          *food.0 = rand::rng().random_range(0..cols); 
+          *food.1 = rand::rng().random_range(0..rows);
+    }
+    return true;
+}
+fn display(snake:&Vec<(u16,u16)>,food:(&u16,&u16)){
+    eterm!(clear);
+    eterm!(move(snake[0].0,snake[0].1));
+    eterm!(color(fg,Blue));
+    print!("@");
+    eterm!(color(fg,Green));
+    for i in 1..snake.len(){
+        eterm!(move(snake[i].0,snake[i].1));
+        print!("#");
+    } 
+    eterm!(move(*food.0,*food.1));
+    eterm!(color(fg,Red));
+    print!("*");
+}
